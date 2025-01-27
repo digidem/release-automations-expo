@@ -39,6 +39,7 @@ function dynamicConfig(configContext) {
  * @param {string} packageJsonVersion
  * @param {string} variant
  *
+ * @returns {string}
  */
 function getVersion(packageJsonVersion, variant) {
   const base = packageJsonVersion.replace(/-.*/, "");
@@ -79,7 +80,6 @@ function getVersion(packageJsonVersion, variant) {
 }
 
 /**
- *
  * @param {string} variant
  * @returns {string}
  */
