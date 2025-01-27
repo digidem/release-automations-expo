@@ -32,8 +32,6 @@ function dynamicConfig(configContext) {
     },
   };
 
-  console.log({ version, name, appId });
-
   return result;
 }
 
