@@ -45,12 +45,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Build
+      - name: Set up Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build on EAS
         id: build
-        # Check whether EAS build needs the sha of the commit to build
         run: |
-          eas_build_url=$( echo 'Run EAS build here, ideally with nowait' )
+          eas_build_url=$( eas build --platform android --profile release-candidate --non-interactive --no-wait )
           echo "eas_build_url=$eas_build_url" >> $GITHUB_OUTPUT
 
   comment:
