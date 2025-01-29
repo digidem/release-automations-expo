@@ -7,6 +7,9 @@ on:
     branches:
       - 'release/**'
 
+env:
+  EAS_PROJECT_URL: "https://expo.dev/accounts/digidem/projects/example-app"
+
 jobs:
   build:
     name: Build
@@ -37,7 +40,8 @@ jobs:
       - name: Build on EAS
         id: build
         run: |
-          eas_build_url=$( eas build --platform android --profile production --non-interactive --no-wait )
+          build_id=$( eas build --platform android --profile production --json --non-interactive --no-wait | jq '.[0].id' --raw-output )
+          eas_build_url="$EAS_PROJECT_URL/builds/$build_id"
           echo "eas_build_url=$eas_build_url" >> $GITHUB_OUTPUT
 
   comment:
