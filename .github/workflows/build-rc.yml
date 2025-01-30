@@ -20,9 +20,6 @@ on:
         required: true
         type: string
 
-env:
-  EAS_PROJECT_URL: 'https://expo.dev/accounts/digidem/projects/example-app'
-
 jobs:
   build:
     name: Build
@@ -61,6 +58,8 @@ jobs:
 
       - name: Build on EAS
         id: build
+        env:
+          EAS_PROJECT_URL: ${{ vars.EAS_PROJECT_URL }}
         run: |
           build_id=$( eas build --platform android --profile release-candidate --json --non-interactive --no-wait | jq '.[0].id' --raw-output )
           eas_build_url="$EAS_PROJECT_URL/builds/$build_id"
