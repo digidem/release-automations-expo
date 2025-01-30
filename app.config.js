@@ -84,7 +84,7 @@ function getVersion(packageJsonVersion, variant) {
  * @returns {string}
  */
 function getDisplayedName(variant) {
-  let base = "Example App";
+  let base = "Release Automations Example";
 
   switch (variant) {
     case "development": {
@@ -107,7 +107,7 @@ function getDisplayedName(variant) {
  * @returns {string}
  */
 function getAppId(variant) {
-  let base = "com.digidem.exampleapp";
+  let base = "com.andrewchou.releaseautomationsexample";
 
   switch (variant) {
     case "development": {

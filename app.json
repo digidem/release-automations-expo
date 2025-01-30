@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "example-app",
-    "slug": "example-app",
-    "owner": "digidem",
+    "name": "release-automations-example",
+    "slug": "release-automations-example",
+    "owner": "andrewchou",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -26,7 +26,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "6f3a8ce9-0d6b-4c6e-af1b-a612f3757cfe"
+        "projectId": "bc83c5e7-4bba-4863-be7a-e643eaf8a7d7"
       }
     }
   }
