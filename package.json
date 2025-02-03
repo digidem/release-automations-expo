@@ -9,11 +9,11 @@
     "ios": "expo run:ios"
   },
   "dependencies": {
-    "expo": "~52.0.27",
-    "expo-application": "~6.0.2",
-    "expo-dev-client": "~5.0.10",
-    "expo-status-bar": "~2.0.1",
-    "expo-updates": "~0.26.13",
+    "expo": "52.0.28",
+    "expo-application": "6.0.2",
+    "expo-dev-client": "5.0.11",
+    "expo-status-bar": "2.0.1",
+    "expo-updates": "0.26.15",
     "react": "18.3.1",
     "react-native": "0.76.6"
   },
