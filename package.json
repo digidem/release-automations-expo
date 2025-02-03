@@ -6,7 +6,8 @@
     "prebuild": "expo prebuild",
     "start": "expo start",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "types": "tsc --noEmit"
   },
   "dependencies": {
     "expo": "52.0.28",
