@@ -64,7 +64,7 @@ jobs:
         run: |
           git checkout ${{ env.TRUNK_BRANCH }}
           npm version ${{ steps.version.outputs.nextVersion }} --no-git-tag-version
-          git commit -am "chore: start v${{ steps.version.outputs.nextMinor }} development interation"
+          git commit -am "chore: start v${{ steps.version.outputs.nextMinor }} development iteration"
 
       - name: Push changes
         run: |
