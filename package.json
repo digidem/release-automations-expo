@@ -12,11 +12,11 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"expo": "52.0.28",
+		"expo": "52.0.30",
 		"expo-application": "6.0.2",
 		"expo-dev-client": "5.0.11",
 		"expo-status-bar": "2.0.1",
-		"expo-updates": "0.26.15",
+		"expo-updates": "0.26.16",
 		"react": "18.3.1",
 		"react-native": "0.76.6"
 	},
