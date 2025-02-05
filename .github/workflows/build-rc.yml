@@ -62,6 +62,11 @@ jobs:
                   EAS_PROJECT_URL: ${{ vars.EAS_PROJECT_URL }}
               run: |
                   build_id=$( eas build --platform android --profile release-candidate --json --non-interactive --no-wait | jq '.[0].id' --raw-output )
+                  if [ -z "$build_id" ]; then
+                    echo "Unable to get build ID"
+                    exit 1
+                  fi
+                  echo "Build ID: $build_id"
                   eas_build_url="$EAS_PROJECT_URL/builds/$build_id"
                   echo "eas_build_url=$eas_build_url" >> $GITHUB_OUTPUT
 
