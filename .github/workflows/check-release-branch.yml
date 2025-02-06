@@ -39,54 +39,29 @@ jobs:
                     exit 1
                   fi
 
-    check_pr_branch:
-        name: Check PR branch
+    check_source_branch:
+        name: Check source branch
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+            - name: Assert source branch is RC branch
+              if: ${{ !startsWith(github.head_ref, 'rc/') }}
+              run: exit 1
 
-            - name: Get branch name of the PR
-              id: pr_branch_name
-              run: |
-                  pr_branch_name=$(git branch --show-current)
-                  echo "result=$PR_BRANCH_NAME" >> $GITHUB_OUTPUT
+    check_release_version:
+        name: Check release version
+        needs: check_source_branch
+        runs-on: ubuntu-latest
 
-            - name: Assert pull request is created from a RC branch
-              env:
-                  PR_BRANCH_NAME: ${{ steps.pr_branch_name.outputs.result }}
-              run: |
-                  set -x
-                  if [ $PR_BRANCH_NAME != rc/* ]; then
-                      echo "Pull request to release branch must come from RC branch"
-                      exit 1
-                  fi
-
+        steps:
             - name: Parse version
               id: version
               uses: ./.github/parse-version
 
             - name: Assert release version is not pre-release
-              env:
-                  RELEASE_VERSION: ${{ steps.version.outputs.releaseVersion }}
-              run: |
-                  set -x
-                  echo $RELEASE_VERSION
-                  if [ $RELEASE_VERSION = *-pre ]; then
-                    echo "Release version cannot be pre-release"
-                    exit 1
-                  fi
+              if: endsWith(steps.version.outputs.releaseVersion, '-pre')
+              run: exit 1
 
             - name: Assert release version matches RC branch name
-              env:
-                  PR_BRANCH_NAME: ${{ steps.pr_branch_name.outputs.result }}
-                  RELEASE_SHORT: ${{ steps.version.outputs.releaseShort }}
-              run: |
-                  set -x
-                  echo $PR_BRANCH_NAME
-                  echo $RELEASE_SHORT
-                  if [ $PR_BRANCH_NAME != "rc/v$RELEASE_SHORT" ]; then
-                      echo "Release version does not match RC branch"
-                      exit 1
-                  fi
+              if: format('rc/{0}', steps.version.outputs.release) != github.head_ref
+              run: exit 1
