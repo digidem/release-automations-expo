@@ -54,6 +54,13 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Checkout package.json
+              uses: actions/checkout@v4
+              with:
+                  sparse-checkout: |
+                      package.json
+                  sparse-checkout-cone-mode: false
+
             - name: Parse version
               id: version
               uses: ./.github/parse-version
