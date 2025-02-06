@@ -71,5 +71,5 @@ jobs:
               run: exit 1
 
             - name: Assert release version matches RC branch name
-              if: format('rc/v{0}', steps.version.outputs.releaseShort) != github.head_ref
+              if: format('rc/v{0}', steps.version.outputs.releaseShort) != github.event.pull_request.head.ref
               run: exit 1
