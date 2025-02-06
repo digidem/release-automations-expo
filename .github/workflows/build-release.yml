@@ -77,9 +77,23 @@ jobs:
         needs: build
 
         steps:
+            - name: Create GitHub App Token
+              uses: actions/create-github-app-token@v1
+              id: app-token
+              with:
+                  app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+                  private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  token: ${{ steps.app-token.outputs.token }}
+
             - name: Parse version
               id: version
               uses: ./.github/parse-version
+
             - name: Tag release
               run: |
                   git config --global user.name 'awana-release-bot[bot]'
