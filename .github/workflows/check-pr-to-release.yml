@@ -1,4 +1,4 @@
-name: Check Release Branch
+name: Check PR to Release
 
 on:
     pull_request:
