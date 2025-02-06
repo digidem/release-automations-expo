@@ -54,11 +54,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout package.json
+            - name: Checkout necessary files
               uses: actions/checkout@v4
               with:
                   sparse-checkout: |
                       package.json
+                      .github/parse-version/action.yml
                   sparse-checkout-cone-mode: false
 
             - name: Parse version
