@@ -1,4 +1,4 @@
-name: Check Release Branch
+name: Check PR to Release
 
 on:
     pull_request:
@@ -10,7 +10,7 @@ on:
             - 'release/**'
 
 jobs:
-    check_branch:
+    check_release_branch:
         name: No Commits
         runs-on: ubuntu-latest
 
@@ -38,3 +38,37 @@ jobs:
                     echo "Base branch has commits since merge base"
                     exit 1
                   fi
+
+    check_source_branch:
+        name: Check source branch
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Assert source branch is RC branch
+              if: ${{ !startsWith(github.head_ref, 'rc/') }}
+              run: exit 1
+
+    check_release_version:
+        name: Check release version
+        needs: check_source_branch
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout package.json
+              uses: actions/checkout@v4
+              with:
+                  sparse-checkout: |
+                      package.json
+                  sparse-checkout-cone-mode: false
+
+            - name: Parse version
+              id: version
+              uses: ./.github/parse-version
+
+            - name: Assert release version is not pre-release
+              if: endsWith(steps.version.outputs.releaseVersion, '-pre')
+              run: exit 1
+
+            - name: Assert release version matches RC branch name
+              if: format('rc/v{0}', steps.version.outputs.releaseShort) != github.head_ref
+              run: exit 1
