@@ -39,8 +39,8 @@ jobs:
                     exit 1
                   fi
 
-    check_rc_branch:
-        name: Check RC branch
+    check_pr_branch:
+        name: Check PR branch
         runs-on: ubuntu-latest
 
         steps:
