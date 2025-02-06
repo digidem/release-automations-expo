@@ -38,3 +38,20 @@ jobs:
                     echo "Base branch has commits since merge base"
                     exit 1
                   fi
+
+    assert_from_rc_branch:
+        name: Only allow pull request from RC branch
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Assert pull request is created from a RC branch
+              run: |
+                  set -x
+                  PR_BRANCH_NAME=$(git branch --show-current)
+                  if [ $PR_BRANCH_NAME != rc/* ]; then
+                      echo "Pull request to release branch must come from RC branch"
+                      exit 1
+                  fi
