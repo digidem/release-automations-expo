@@ -89,6 +89,9 @@ jobs:
               with:
                   token: ${{ steps.app-token.outputs.token }}
 
+            - run: npm install --no-save semver
+              shell: bash
+
             # parse-version action doesn't exactly do what we want
             - name: Extract release version
               id: version
