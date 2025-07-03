@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 80,
 		paddingHorizontal: 20,
 		gap: 40,
+		margin: 0,
 	},
 	infoContainer: {
 		gap: 20,
