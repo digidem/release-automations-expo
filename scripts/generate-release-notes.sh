@@ -56,7 +56,7 @@ echo "Found $COUNT PRs in range."
       (.body // "" | split("\n")[] |
         select(test("(?i)(close|fix|resolve)s? #[0-9]+")) |
         capture(".*#(?<issue>[0-9]+).*") |
-        "[closed #\(.issue)](https://github.com/digidem/comapeo-mobile/issues/\(.issue))")
+        "[closed #\(.issue)](https://github.com/digidem/release-automations-expo/issues/\(.issue))")
       // empty
     ),
     ""  # Always print a blank line at the end of each PR
@@ -80,7 +80,7 @@ ISSUE_NUMBERS=$(echo "$FILTERED_PRS" | jq -r '
 while read -r ISSUE; do
   TITLE=$(gh issue view "$ISSUE" --json title -q .title 2>/dev/null)
   if [ -n "$TITLE" ]; then
-    echo "[closed #$ISSUE](https://github.com/digidem/comapeo-mobile/issues/$ISSUE): $TITLE"
+    echo "[closed #$ISSUE](https://github.com/digidem/release-automations-expo/issues/$ISSUE): $TITLE"
     echo ""
   fi
 done <<< "$ISSUE_NUMBERS"
