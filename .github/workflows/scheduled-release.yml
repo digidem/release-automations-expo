@@ -55,6 +55,13 @@ jobs:
                   git branch ${{ steps.branches.outputs.release }}
                   git checkout -b ${{ steps.branches.outputs.rc }}
 
+            - name: Generate release notes
+              run: |
+                  chmod +x scripts/generate-release-notes.sh
+                  ./scripts/generate-release-notes.sh
+                  git add release-notes.md
+                  git commit -m "docs: add release notes for v${{ steps.version.outputs.releaseShort }}"
+
             - name: Set target release version in package.json
               run: |
                   npm version ${{ steps.version.outputs.releaseVersion }} --no-git-tag-version
