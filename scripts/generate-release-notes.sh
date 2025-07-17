@@ -30,8 +30,6 @@ ALL_PRS=$(gh pr list \
   --json number,title,body,url,labels,mergedAt \
   --limit 1000)
 
-echo "$ALL_PRS"
-
 # Filter by merge date
 FILTERED_PRS=$(echo "$ALL_PRS" | jq --arg start "$START_DATE" --arg end "$END_DATE" '
   map(select(.mergedAt >= $start and .mergedAt <= $end))')
