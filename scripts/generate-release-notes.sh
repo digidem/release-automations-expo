@@ -5,6 +5,9 @@ MINOR_VERSION=$(jq -r .version package.json | cut -d. -f2)
 START_COMMIT_MSG="chore: start v$MINOR_VERSION development iteration"
 END_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") # current UTC time
 
+RELEASE_NOTES_FILE="release-notes/release-notes-v$MINOR_VERSION.md"
+
+mkdir -p release-notes
 
 # Get SHAs
 START_SHA=$(git log --oneline | grep -F "$START_COMMIT_MSG" | awk '{print $1}' | head -n 1)
@@ -82,5 +85,6 @@ while read -r ISSUE; do
     echo ""
   fi
 done <<< "$ISSUE_NUMBERS"
-} > release-notes.md
+
+} > "$RELEASE_NOTES_FILE"
 
