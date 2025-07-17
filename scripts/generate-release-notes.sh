@@ -55,7 +55,7 @@ echo "Found $COUNT PRs in range."
     "PR #\(.number): \(.title)",
     (
       (.body // "" | split("\n")[] |
-        select(test("(?i)(close|fix|resolve)s? #[0-9]+")) |
+        select(test("(?i)(close[sd]?|fix(e[sd])?|resolve[sd]?):?\\s*#[0-9]+")) |
         capture(".*#(?<issue>[0-9]+).*") |
         "[closed #\(.issue)](https://github.com/digidem/release-automations-expo/issues/\(.issue))")
       // empty
@@ -72,7 +72,7 @@ echo ""
 ISSUE_NUMBERS=$(echo "$FILTERED_PRS" | jq -r '
   [.[] |
     (.body // "" | split("\n")[] |
-      select(test("(?i)(close|fix|resolve)s? #[0-9]+")) |
+      select(test("(?i)(close[sd]?|fix(e[sd])?|resolve[sd]?):?\\s*#[0-9]+")) |
       capture(".*#(?<issue>[0-9]+).*") |
       .issue)
   ] | unique | .[]')
