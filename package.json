@@ -1,6 +1,6 @@
 {
 	"name": "release-automations-example",
-	"version": "1.6.0-pre",
+	"version": "1.7.0-pre",
 	"main": "index.ts",
 	"scripts": {
 		"start": "expo start",
