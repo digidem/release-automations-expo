@@ -5,7 +5,8 @@ MINOR_VERSION=$(jq -r .version package.json | cut -d. -f2)
 START_COMMIT_MSG="chore: start v$MINOR_VERSION development iteration"
 END_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") # current UTC time
 
-RELEASE_NOTES_FILE="release-notes/release-notes-v$MINOR_VERSION.md"
+RELEASE_NOTES_FILE="release-notes/closed-prs-v$MINOR_VERSION.md"
+CLOSED_ISSUES_FILE="release-notes/closed-issues-v$MINOR_VERSION.md"
 
 mkdir -p release-notes
 
@@ -42,7 +43,7 @@ echo "Found $COUNT PRs in range."
 
 # Format release notes
 {
-  echo "# Release Notes for v$MINOR_VERSION"
+  echo "# Closed Prs for v$MINOR_VERSION"
   echo ""
   echo " PRs merged between:"
   echo "> - $START_COMMIT_MSG ($START_DATE, SHA: $START_SHA)"
@@ -65,8 +66,12 @@ echo "Found $COUNT PRs in range."
 '
 
     # Now create the summary list of unique closed issues
-  echo "## Closed Issues Summary"
-echo ""
+  
+  echo ""
+} >> "$RELEASE_NOTES_FILE"
+{
+  echo "# Closed Issues for v$MINOR_VERSION"
+  echo ""
 
 # Extract unique issue numbers
 ISSUE_NUMBERS=$(echo "$FILTERED_PRS" | jq -r '
@@ -86,5 +91,5 @@ while read -r ISSUE; do
   fi
 done <<< "$ISSUE_NUMBERS"
 
-} > "$RELEASE_NOTES_FILE"
+} >> "$CLOSED_ISSUES_FILE"
 
