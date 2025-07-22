@@ -43,15 +43,15 @@ jobs:
                   app-id: ${{ vars.RELEASE_BOT_APP_ID }}
                   private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
-            - name: Parse version
-              id: version
-              uses: ./.github/parse-version
-
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
                   ref: ${{ env.BUILD_SHA }}
                   fetch-depth: 0
+
+            - name: Parse version
+              id: version
+              uses: ./.github/parse-version
 
             - name: Generate cherry pick release notes
               env:
