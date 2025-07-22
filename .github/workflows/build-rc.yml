@@ -56,6 +56,8 @@ jobs:
                   chmod +x scripts/generate-release-notes.sh
                   ./scripts/generate-release-notes.sh
 
+                  git config --global user.name 'awana-release-bot[bot]'
+                  git config --global user.email '${{ vars.RELEASE_BOT_USER_ID }}+awana-release-bot[bot]@users.noreply.github.com'
                   git add release-notes/closed-issues-v*.md release-notes/closed-prs-v*.md
                   git commit -m "docs: add cherry pick commits to release notes"
 
