@@ -47,10 +47,7 @@ jobs:
                   chmod +x scripts/generate-release-notes.sh
                   ./scripts/generate-release-notes.sh
 
-                  # Format the release notes
-                  npx prettier --write release-notes/release-notes-v*.md
-
-                  git add release-notes/release-notes-v*.md
+                  git add release-notes/closed-issue-v*.md release-notes/closed-prs-v*.md
                   git commit -m "docs: add cherry pick commits to release notes"
 
             - name: Setup Node.js
