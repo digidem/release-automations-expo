@@ -56,7 +56,7 @@ jobs:
                   chmod +x scripts/generate-release-notes.sh
                   ./scripts/generate-release-notes.sh
 
-                  git add release-notes/closed-issue-v*.md release-notes/closed-prs-v*.md
+                  git add release-notes/closed-issues-v*.md release-notes/closed-prs-v*.md
                   git commit -m "docs: add cherry pick commits to release notes"
 
             - name: Setup Node.js
