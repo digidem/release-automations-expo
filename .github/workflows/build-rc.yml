@@ -56,15 +56,21 @@ jobs:
             - name: Generate cherry pick release notes
               env:
                   GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  RELEASE_BRANCH: rc/v${{ steps.version.outputs.releaseMinor }}.0
               run: |
                   chmod +x scripts/generate-release-notes.sh
                   ./scripts/generate-release-notes.sh
 
                   git config --global user.name 'awana-release-bot[bot]'
                   git config --global user.email '${{ vars.RELEASE_BOT_USER_ID }}+awana-release-bot[bot]@users.noreply.github.com'
+
+                  # Fetch and checkout the branch
+                  git fetch origin $RELEASE_BRANCH
+                  git checkout $RELEASE_BRANCH
+
                   git add release-notes/closed-issues-v*.md release-notes/closed-prs-v*.md
                   git commit -m "docs: add cherry pick commits to release notes"
-                  git push origin rc/v${{ steps.version.outputs.releaseMinor }}.0
+                  git push origin $RELEASE_BRANCH
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
