@@ -36,6 +36,13 @@ jobs:
             pr_head_sha: ${{ inputs.pr_head_sha || github.event.pull_request.head.sha }}
 
         steps:
+            - name: Create GitHub App Token
+              uses: actions/create-github-app-token@v1
+              id: app-token
+              with:
+                  app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+                  private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
@@ -43,6 +50,8 @@ jobs:
                   fetch-depth: 0
 
             - name: Generate cherry pick release notes
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
               run: |
                   chmod +x scripts/generate-release-notes.sh
                   ./scripts/generate-release-notes.sh
