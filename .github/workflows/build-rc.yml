@@ -40,6 +40,18 @@ jobs:
               uses: actions/checkout@v4
               with:
                   ref: ${{ env.BUILD_SHA }}
+                  fetch-depth: 0
+
+            - name: Generate cherry pick release notes
+              run: |
+                  chmod +x scripts/generate-release-notes.sh
+                  ./scripts/generate-release-notes.sh
+
+                  # Format the release notes
+                  npx prettier --write release-notes/release-notes-v*.md
+
+                  git add release-notes/release-notes-v*.md
+                  git commit -m "docs: add cherry pick commits to release notes"
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
