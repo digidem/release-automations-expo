@@ -16,7 +16,7 @@ START_SHA=$(git log --oneline | grep -F "$START_COMMIT_MSG" | awk '{print $1}' |
 
 if [ -z "$START_SHA" ];  then
   echo "Could not find start commit."
-  exit 1
+  exit 0
 fi
 
 # Get ISO8601 timestamps
