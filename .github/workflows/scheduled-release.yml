@@ -64,9 +64,9 @@ jobs:
                   ./scripts/generate-release-notes.sh
 
                   # Format the release notes
-                  npx prettier --write release-notes/release-notes-v*.md
+                  npx prettier --write release-notes/**/*.md
 
-                  git add release-notes/release-notes-v*.md
+                  git add release-notes/
                   git commit -m "docs: add release notes for v${{ steps.version.outputs.releaseShort }}"
 
             - name: Set target release version in package.json
