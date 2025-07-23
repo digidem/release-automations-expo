@@ -12,36 +12,3 @@ PR #44: chore: update release notes files
 
 PR #45: docs: generate notes from cherry pick
 [closed #43](https://github.com/digidem/release-automations-expo/issues/43)
-# Closed Prs for v6
-
- PRs merged between:
-> - chore: start v6 development iteration (2025-07-17T22:19:48Z, SHA: 888051f)
-> - 2025-07-22T22:14:46Z
-
-PR #40: Test Crowdin reminder comment on RC PR
-
-PR #44: chore: update release notes files
-[closed #42](https://github.com/digidem/release-automations-expo/issues/42)
-
-PR #45: docs: generate notes from cherry pick
-[closed #43](https://github.com/digidem/release-automations-expo/issues/43)
-
-PR #46: chore: added cherry pick release notes github workflow
-
-PR #47: chore: add github token
-
-PR #48: chore: remove prettier add correct file
-
-PR #49: chore: fix typo
-
-PR #50: chore: add git config variable
-
-PR #51: chore: update build rc command to push and NOT build
-
-PR #52: chore: parse
-
-PR #53: chore: nameing
-
-PR #54: chore: update to checkout
-
-
