@@ -2,7 +2,7 @@
 
 MINOR_VERSION=$(jq -r .version package.json | cut -d. -f2)
 
-RELEASE_NOTES_FILE="release-notes/release-notes-v$MINOR_VERSION.md"
+RELEASE_NOTES_FILE="release-notes/closed-prs-v$MINOR_VERSION.md"
 CLOSED_ISSUES_FILE="release-notes/closed-issues-v$MINOR_VERSION.md"
 
 mkdir -p release-notes
@@ -15,7 +15,7 @@ PR_NUMBER=$(gh pr list --head "$RC_BRANCH" --json number --jq '.[0].number')
 
 if [ -z "$PR_NUMBER" ]; then
   echo "❌ No PR found for branch: $RC_BRANCH"
-  exit 1
+  exit 0
 fi
 
 echo "✅ Found PR: #$PR_NUMBER"
@@ -31,9 +31,11 @@ COMMIT_HEADERS=$(gh pr view "$PR_NUMBER" --json commits --jq '.commits[]
     }
 ' | jq -s '.')
 
+echo "Extracted commit headers for PR #$COMMIT_HEADERS"
+
 if [ -z "$COMMIT_HEADERS" ]; then
   echo "❌ No commits found in PR #$PR_NUMBER"
-  exit 1
+  exit 0
 fi
 
 # Extract the PR creation date
@@ -44,8 +46,7 @@ cherry_pick_date=$(echo "$PR_DATA" | jq -r --arg body "/build-rc" '
   .comments
   | map(select(.body == $body))
   | sort_by(.createdAt)
-  | last
-  | if . then .createdAt else null end
+  | if length >= 2 then .[-2].createdAt else null end
 ')
 
 # Set CHERRY_PICK_START_DATE
@@ -56,6 +57,8 @@ else
   echo "No '/build-rc' comment found. Using PR creation date: $CHERRY_PICK_START_DATE"
 fi
 
+echo "Using cherry-pick start date: $CHERRY_PICK_START_DATE"
+
 FILTERED_COMMITS=$(echo "$COMMIT_HEADERS" | jq --arg start "$CHERRY_PICK_START_DATE" '
   map(select(.createdAt >= $start))
 ')
@@ -63,9 +66,11 @@ FILTERED_COMMITS=$(echo "$COMMIT_HEADERS" | jq --arg start "$CHERRY_PICK_START_D
 # Extract PR numbers from headlines like: fix: something (#1234)
 PR_REFERENCES=$(echo "$FILTERED_COMMITS" | grep -oE '\(#([0-9]+)\)' | grep -oE '[0-9]+' | sort -n | uniq)
 
+echo "Found PR references: $PR_REFERENCES"
+
 if [ -z "$PR_REFERENCES" ]; then
   echo "❌ No PR numbers found in commit message headlines"
-  exit 1
+  exit 0
 fi
 
 CHERRY_PICKED_COMMITS="[]"
