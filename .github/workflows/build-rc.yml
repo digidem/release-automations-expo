@@ -61,6 +61,9 @@ jobs:
                   chmod +x scripts/generate-cherry-pick-release-notes.sh
                   ./scripts/generate-cherry-pick-release-notes.sh
 
+                  # Format the release notes
+                  npx prettier --write release-notes/**/*.md
+
                   git config --global user.name 'awana-release-bot[bot]'
                   git config --global user.email '${{ vars.RELEASE_BOT_USER_ID }}+awana-release-bot[bot]@users.noreply.github.com'
 
@@ -68,7 +71,7 @@ jobs:
                   git fetch origin $RELEASE_BRANCH
                   git checkout $RELEASE_BRANCH
 
-                  git add release-notes/closed-issues-v*.md release-notes/closed-prs-v*.md
+                  git add release-notes/
                   git commit -m "docs: add cherry pick commits to release notes"
                   git push origin $RELEASE_BRANCH
 
