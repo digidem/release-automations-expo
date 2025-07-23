@@ -14,6 +14,7 @@ PR #45: docs: generate notes from cherry pick
 [closed #43](https://github.com/digidem/release-automations-expo/issues/43)
 
 ## Closed Prs cherry picked onto RC created on 2025-07-23 15:43:11 EDT
+
 PR #44: chore: update release notes files
 [closed #42](https://github.com/digidem/release-automations-expo/issues/42)
 
@@ -40,3 +41,10 @@ PR #55: chore: use right script
 
 PR #56: chore: update to find second last build-rc comment
 
+## Closed Prs cherry picked onto RC created on 2025-07-23 17:25:59 EDT
+
+PR #58: chore: format release notes folder
+[closed #57](https://github.com/digidem/release-automations-expo/issues/57)
+
+PR #60: chore: format cherry pick release notes
+[closed #59](https://github.com/digidem/release-automations-expo/issues/59)
