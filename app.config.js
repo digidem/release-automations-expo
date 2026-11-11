@@ -107,7 +107,7 @@ function getDisplayedName(variant) {
  * @returns {string}
  */
 function getAppId(variant) {
-	let base = 'com.andrewchou.releaseautomationsexample'
+	let base = 'com.comapeo.practice'
 
 	switch (variant) {
 		case 'development': {

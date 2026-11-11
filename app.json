@@ -1,8 +1,8 @@
 {
 	"expo": {
 		"name": "release-automations-example",
-		"slug": "release-automations-example",
-		"owner": "andrewchou",
+		"slug": "comapeo-ios-practice",
+		"owner": "digidem",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "light",
@@ -26,7 +26,7 @@
 		},
 		"extra": {
 			"eas": {
-				"projectId": "bc83c5e7-4bba-4863-be7a-e643eaf8a7d7"
+				"projectId": "f9ba9126-aadb-4ded-817d-6cdb5067fbd4"
 			}
 		}
 	}
