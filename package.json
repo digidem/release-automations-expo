@@ -12,22 +12,22 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"expo": "52.0.30",
-		"expo-application": "6.0.2",
-		"expo-dev-client": "5.0.11",
-		"expo-status-bar": "2.0.1",
-		"expo-updates": "0.26.16",
-		"react": "18.3.1",
-		"react-native": "0.76.6"
+		"expo": "56.0.21",
+		"expo-application": "56.0.3",
+		"expo-dev-client": "56.0.26",
+		"expo-status-bar": "56.0.4",
+		"expo-updates": "56.0.26",
+		"react": "19.2.3",
+		"react-native": "0.85.3"
 	},
 	"devDependencies": {
-		"@babel/core": "7.26.7",
-		"@types/node": "20.17.16",
-		"@types/react": "18.3.18",
+		"@babel/core": "7.29.7",
+		"@types/node": "24.13.2",
+		"@types/react": "19.2.17",
 		"husky": "9.1.7",
 		"lint-staged": "15.4.3",
 		"prettier": "3.4.2",
-		"typescript": "5.7.3"
+		"typescript": "5.9.3"
 	},
 	"private": true
 }
