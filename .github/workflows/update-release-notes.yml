@@ -1,0 +1,56 @@
+# Summary:
+#
+# Replaces the notes on an existing GitHub Release with the release notes file on a release branch,
+# without building anything.
+#
+# Triggers:
+#
+# - Manually, from the Actions tab. Pick the release branch (e.g. `release/v4.x`) in the
+#   "Use workflow from" dropdown.
+#
+# Effects:
+#
+# - Updates the notes of the GitHub Release `v${version}` from `release-notes/closed-prs-v${minor}.md`.
+#   Edit that file on the release branch first.
+name: Update Release Notes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Update notes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check this is a release branch
+        if: ${{ !startsWith(github.ref_name, 'release/') }}
+        run: |
+          echo "::error::Run this workflow from a release branch, not $GITHUB_REF_NAME"
+          exit 1
+
+      - name: Create GitHub App Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - run: npm install --no-save semver
+        shell: bash
+
+      - name: Update GitHub Release notes
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          minor=$(node -e "const {version} = require('./package.json'); console.log(require('semver').parse(version).minor);")
+          patch=$(node -e "const {version} = require('./package.json'); console.log(require('semver').parse(version).patch);")
+          NOTES_FILE="release-notes/closed-prs-v${minor}.md"
+          if [ ! -f "$NOTES_FILE" ]; then
+            echo "::error::$NOTES_FILE does not exist on $GITHUB_REF_NAME"
+            exit 1
+          fi
+          gh release edit "v${minor}.${patch}" --notes-file "$NOTES_FILE"

@@ -1,0 +1,104 @@
+# Summary:
+#
+# Creates a production build of the iOS app from a release branch and uploads it to App Store Connect.
+#
+# Triggers:
+#
+# - Manually, from the Actions tab. Pick the release branch (e.g. `release/v4.x`) in the
+#   "Use workflow from" dropdown.
+#
+# Effects:
+#
+# - Triggers a Release build on EAS
+# - Uploads the build to App Store Connect via `eas submit`, if `submit` is checked. This makes it
+#   available in TestFlight but does NOT submit it for App Store review. Release notes and the
+#   submission for review are done by hand in App Store Connect.
+name: Release iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Upload to App Store Connect'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.build.outputs.build_id }}
+
+    steps:
+      - name: Check this is a release branch
+        if: ${{ !startsWith(github.ref_name, 'release/') }}
+        run: |
+          echo "::error::Run this workflow from a release branch, not $GITHUB_REF_NAME"
+          exit 1
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Set up Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build on EAS
+        id: build
+        env:
+          EAS_PROJECT_URL: ${{ vars.EAS_PROJECT_URL }}
+        run: |
+          build_id=$( eas build --platform ios --profile production --json --non-interactive --no-wait | jq '.[0].id' --raw-output )
+          if [ -z "$build_id" ]; then
+            echo "Unable to get build ID"
+            exit 1
+          fi
+          echo "Build ID: $build_id"
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
+          echo ":rocket: iOS release build: $EAS_PROJECT_URL/builds/$build_id" >> $GITHUB_STEP_SUMMARY
+
+  submit:
+    name: Upload to App Store Connect
+    runs-on: ubuntu-latest
+    if: inputs.submit
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Set up Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Submit to App Store Connect
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_VARIANT: production
+        run: |
+          eas submit --platform ios --profile production --id ${{ needs.build.outputs.build_id }} --non-interactive
+          echo ":apple: Uploaded to App Store Connect. Add release notes and submit for review there." >> $GITHUB_STEP_SUMMARY

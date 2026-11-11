@@ -42,7 +42,8 @@ function dynamicConfig(configContext) {
  * @returns {string}
  */
 function getVersion(packageJsonVersion, variant) {
-	const base = packageJsonVersion.replace(/-.*/, '')
+	const [, minor, patch] = packageJsonVersion.replace(/-.*/, '').split('.')
+	const base = `${minor}.${patch}`
 
 	let suffix = ''
 
@@ -107,7 +108,7 @@ function getDisplayedName(variant) {
  * @returns {string}
  */
 function getAppId(variant) {
-	let base = 'com.andrewchou.releaseautomationsexample'
+	let base = 'com.comapeo.practice'
 
 	switch (variant) {
 		case 'development': {
