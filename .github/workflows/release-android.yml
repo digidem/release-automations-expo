@@ -1,45 +1,47 @@
 # Summary:
 #
-# Creates a production build of the app and submits it for distribution.
+# Creates a production build of the Android app from a release branch and distributes it.
 #
 # Triggers:
 #
-# - Merging a PR that targets a base branch that matches `release/**`
+# - Manually, from the Actions tab. Pick the release branch (e.g. `release/v4.x`) in the
+#   "Use workflow from" dropdown.
 #
 # Effects:
 #
 # - Triggers a Release build on EAS
-# - Creates a comment on the (merged) Release Candidate PR with a link to the EAS build process.
-# - Creates a release tag named `v${version}` on the merge commit in the targeted `release/**` branch.
-#   `version` is `<minor>.<patch>` e.g. `1.2.0` is truncated to `2.0`.
+# - Creates a release tag named `v${version}` on the release branch, unless it already exists.
+#   Release tags can't be moved, so re-releasing a version keeps the original tag.
 # - Waits for EAS build to complete, then:
-#   - Creates a GitHub Release with the APK downloaded from R2 and release notes attached
-#   - Submits the AAB to the Google Play Store production track via `eas submit`
-name: Build Release
+#   - Creates or updates the GitHub Release with the release notes and the APK downloaded from R2.
+#     If the APK can't be downloaded, the release goes ahead without it and the run ends with a
+#     red X. `build-apk.yml` can attach one afterwards.
+#   - Submits the AAB to the Google Play Store production track via `eas submit`, if `submit` is checked
+name: Release Android
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - 'release/**'
   workflow_dispatch:
     inputs:
-      build_id:
-        description: 'EAS build ID (UUID from expo.dev build URL)'
+      submit:
+        description: 'Submit to the Google Play Store'
         required: true
-        type: string
+        default: true
+        type: boolean
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     outputs:
-      eas_build_url: ${{ steps.build.outputs.eas_build_url }}
       build_id: ${{ steps.build.outputs.build_id }}
 
     steps:
+      - name: Check this is a release branch
+        if: ${{ !startsWith(github.ref_name, 'release/') }}
+        run: |
+          echo "::error::Run this workflow from a release branch, not $GITHUB_REF_NAME"
+          exit 1
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -70,37 +72,11 @@ jobs:
           fi
           echo "Build ID: $build_id"
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
-          eas_build_url="$EAS_PROJECT_URL/builds/$build_id"
-          echo "eas_build_url=$eas_build_url" >> $GITHUB_OUTPUT
-
-  comment:
-    name: Comment
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
-    needs: build
-
-    steps:
-      - name: Create GitHub App Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-
-      - name: Comment on PR
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          COMMENT_BODY: |
-            :rocket: Release build based on ${{ github.event.pull_request.merge_commit_sha }}: ${{ needs.build.outputs.eas_build_url }}
-
-        run: |
-          gh pr comment $PR_NUMBER --body "$COMMENT_BODY" --repo "$GITHUB_REPOSITORY"
+          echo ":rocket: Android release build: $EAS_PROJECT_URL/builds/$build_id" >> $GITHUB_STEP_SUMMARY
 
   tag:
     name: Create release tag
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     needs: build
 
     steps:
@@ -126,25 +102,25 @@ jobs:
           echo "release_version_short=$release_version_short" >> $GITHUB_OUTPUT
 
       - name: Tag release
+        env:
+          TAG: v${{ steps.version.outputs.release_version_short }}
         run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "::notice::$TAG already exists, so this is a re-release. Leaving the tag where it is."
+            exit 0
+          fi
           git config --global user.name 'awana-release-bot[bot]'
           git config --global user.email '${{ vars.RELEASE_BOT_USER_ID }}+awana-release-bot[bot]@users.noreply.github.com'
-          git tag v${{ steps.version.outputs.release_version_short }}
-          git push origin v${{ steps.version.outputs.release_version_short }}
+          git tag "$TAG"
+          git push origin "$TAG"
 
   github-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs: [build, tag]
-    if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && needs.tag.result == 'success'))
     timeout-minutes: 60
 
     steps:
-      - name: Resolve inputs
-        id: inputs
-        run: |
-          echo "build_id=${{ inputs.build_id || needs.build.outputs.build_id }}" >> $GITHUB_OUTPUT
-
       - name: Create GitHub App Token
         uses: actions/create-github-app-token@v1
         id: app-token
@@ -174,7 +150,7 @@ jobs:
 
       - name: Wait for EAS build to finish
         env:
-          BUILD_ID: ${{ steps.inputs.outputs.build_id }}
+          BUILD_ID: ${{ needs.build.outputs.build_id }}
         run: |
           echo "Waiting for EAS build $BUILD_ID to complete..."
           while true; do
@@ -193,18 +169,24 @@ jobs:
       - name: Extract version from EAS build
         id: eas_version
         env:
-          BUILD_ID: ${{ steps.inputs.outputs.build_id }}
+          BUILD_ID: ${{ needs.build.outputs.build_id }}
         run: |
           version=$(eas build:view "$BUILD_ID" --json | jq -r '.appVersion')
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Download APK from R2
+        id: apk
+        continue-on-error: true
         env:
           VERSION: ${{ steps.eas_version.outputs.version }}
         run: |
           APK_URL="https://downloads.comapeo.app/android/release/comapeo-v${VERSION}.apk"
           echo "Downloading APK from $APK_URL"
-          curl -fL "$APK_URL" -o "comapeo-v${VERSION}.apk"
+          if ! curl -fL "$APK_URL" -o "comapeo-v${VERSION}.apk"; then
+            echo "::error::Could not download the APK from $APK_URL. The GitHub Release will be created without it. Run the Build APK workflow to attach one."
+            echo ":warning: The APK could not be downloaded, so the GitHub Release has no APK. Run the Build APK workflow to attach one." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: Read release notes
         id: release_notes
@@ -223,21 +205,36 @@ jobs:
             echo "body=No release notes found." >> $GITHUB_OUTPUT
           fi
 
-      - name: Create GitHub Release
+      - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           VERSION: ${{ steps.eas_version.outputs.version }}
           RELEASE_BODY: ${{ steps.release_notes.outputs.body }}
+          APK_DOWNLOADED: ${{ steps.apk.outcome == 'success' }}
         run: |
-          gh release create "v${VERSION}" \
-            --title "CoMapeo v${VERSION}" \
-            --notes "$RELEASE_BODY" \
-            "comapeo-v${VERSION}.apk#CoMapeo Android APK"
+          if gh release view "v${VERSION}" > /dev/null 2>&1; then
+            gh release edit "v${VERSION}" --notes "$RELEASE_BODY"
+          else
+            gh release create "v${VERSION}" \
+              --title "CoMapeo v${VERSION}" \
+              --notes "$RELEASE_BODY"
+          fi
+          if [ "$APK_DOWNLOADED" = "true" ]; then
+            gh release upload "v${VERSION}" "comapeo-v${VERSION}.apk#CoMapeo Android APK" --clobber
+          fi
+
+      # Fails the run (red X, and GitHub's failed-workflow email) only after the release is created.
+      # Play Store submission is a separate job, so it is not affected.
+      - name: Report missing APK
+        if: steps.apk.outcome == 'failure'
+        run: |
+          echo "::error::The GitHub Release has no APK. Run the Build APK workflow to attach one."
+          exit 1
 
   submit:
     name: Submit to Play Store
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    if: inputs.submit
     needs: build
 
     steps:

@@ -42,7 +42,8 @@ function dynamicConfig(configContext) {
  * @returns {string}
  */
 function getVersion(packageJsonVersion, variant) {
-	const base = packageJsonVersion.replace(/-.*/, '')
+	const [, minor, patch] = packageJsonVersion.replace(/-.*/, '').split('.')
+	const base = `${minor}.${patch}`
 
 	let suffix = ''
 

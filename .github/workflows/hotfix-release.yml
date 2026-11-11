@@ -120,4 +120,4 @@ jobs:
 
             :construction: An initial Release Candidate build will be triggered shortly, and the build URL will be posted here.
 
-            :rocket: Merging this PR will trigger a release build.
+            :rocket: Merging this PR does not release anything. To release, run the `Release Android` and `Release iOS` workflows from `${{ env.RELEASE_BRANCH }}`.
