@@ -16,7 +16,6 @@
 		"expo-application": "56.0.3",
 		"expo-dev-client": "56.0.26",
 		"expo-status-bar": "56.0.4",
-		"expo-updates": "56.0.26",
 		"react": "19.2.3",
 		"react-native": "0.85.3"
 	},
