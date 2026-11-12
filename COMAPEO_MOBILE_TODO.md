@@ -4,13 +4,13 @@ What is left to do in comapeo-mobile once the practice runs below pass.
 
 ## Practice runs
 
-- [ ] Start Scheduled Release creates `release/v9.x`, the RC PR and an RC build
-- [ ] Merging the RC PR releases nothing
-- [ ] Release iOS uploads to App Store Connect
-- [ ] Release iOS a second time for the same version
-- [ ] Release Android (submit unchecked) creates the tag and GitHub Release, and ends with a red X because there is no APK
-- [ ] Build APK attaches the APK to that GitHub Release
-- [ ] Update Release Notes changes the GitHub Release notes
+- [x] Start Scheduled Release creates `release/v9.x`, the RC PR and an RC build
+- [x] Merging the RC PR releases nothing
+- [x] Release iOS uploads to App Store Connect
+- [x] Release iOS a second time for the same version
+- [x] Release Android (submit unchecked) creates the tag and GitHub Release, and ends with a red X because there is no APK
+- [x] Build APK attaches the APK to that GitHub Release
+- [x] Update Release Notes changes the GitHub Release notes
 
 ## Copy over
 
@@ -24,6 +24,7 @@ Do not copy `app.json`, `app.config.js`, the rest of `eas.json`, `.prettierignor
 
 ## Also needed
 
+- Merge #2203 (fix: android upload and release, open since 2026-11-03) before the first real release. It fixes the `mc` download in `scripts/upload-release.sh` (#2201). Until then, the hook can't upload the APK to `downloads.comapeo.app`, so every Release Android run ends without an APK and with a red X.
 - `docs/Releases.md`: merging the RC PR no longer releases; describe the four new workflows.
 - The workflows only run from branches that contain them. To release from a branch cut before the move (e.g. `release/v14.x`), cherry-pick them onto it first.
 

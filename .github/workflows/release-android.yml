@@ -118,7 +118,7 @@ jobs:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs: [build, tag]
-    timeout-minutes: 60
+    timeout-minutes: 180
 
     steps:
       - name: Create GitHub App Token
