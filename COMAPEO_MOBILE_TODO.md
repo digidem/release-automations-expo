@@ -18,6 +18,7 @@ What is left to do in comapeo-mobile once the practice runs below pass.
 - Changed: `scheduled-release.yml`, `hotfix-release.yml` (RC PR text)
 - Delete: `build-release.yml`
 - `eas.json`: add the `production-apk` profile
+- `eas.json`: change the iOS `image` from `latest` to `macos-tahoe-26.5-xcode-26.6`, once a practice iOS build passes with it. `latest` moved to Xcode 27.1, and Expo SDK 56 doesn't compile on it (`expo-modules-jsi`, "command failed with exit code 0"). Xcode 26.6 is what comapeo-mobile last built on, on 2026-11-02.
 
 Do not copy `app.json`, `app.config.js`, the rest of `eas.json`, `.prettierignore` or `ci.yml`. Those changes only point the practice repo at the `comapeo-ios-practice` Expo project.
 
@@ -29,4 +30,4 @@ Do not copy `app.json`, `app.config.js`, the rest of `eas.json`, `.prettierignor
 ## Open questions
 
 - Build APK puts the APK on EAS and the GitHub Release, but not on `downloads.comapeo.app`, which the website uses. `scripts/upload-release.sh` skips any profile other than `production`, `release-candidate` and `pre-release`. If Build APK should update the website too, add `production-apk` there, after #2203 is merged.
-- EAS's `latest` iOS image now has the iOS 27.1 SDK and rejects any dependencies that support below iOS 15. Comapeo-mobile has two dependencies that have subdependencies below iOS 15: `RNDeviceInfo` (9.0, from `react-native-device-info`) and `RNSVG` (12.4, from `react-native-svg`). Our next iOS build on `latest` will probably fail and should probably be fixed to prevent that problem but I am not sure.
+- Before moving iOS builds to Xcode 27 (a later Expo SDK), raise the iOS 15 minimum for `RNDeviceInfo` (9.0, from `react-native-device-info`) and `RNSVG` (12.4, from `react-native-svg`). Xcode 27.1 fails the build on anything below iOS 15. Xcode 26.6 accepts 12.0 and up, and only warns about `RNDeviceInfo`'s 9.0.
