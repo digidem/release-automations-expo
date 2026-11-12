@@ -29,3 +29,4 @@ Do not copy `app.json`, `app.config.js`, the rest of `eas.json`, `.prettierignor
 ## Open questions
 
 - Build APK puts the APK on EAS and the GitHub Release, but not on `downloads.comapeo.app`, which the website uses. `scripts/upload-release.sh` skips any profile other than `production`, `release-candidate` and `pre-release`. If Build APK should update the website too, add `production-apk` there, after #2203 is merged.
+- EAS's `latest` iOS image now has the iOS 27.1 SDK and rejects any dependencies that support below iOS 15. Comapeo-mobile has two dependencies that have subdependencies below iOS 15: `RNDeviceInfo` (9.0, from `react-native-device-info`) and `RNSVG` (12.4, from `react-native-svg`). Our next iOS build on `latest` will probably fail and should probably be fixed to prevent that problem but I am not sure.
